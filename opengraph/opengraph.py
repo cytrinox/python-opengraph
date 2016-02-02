@@ -42,7 +42,7 @@ class OpenGraph(object):
         return response.text
 
     def _parse(self, html):
-        doc = BeautifulSoup(html)
+        doc = BeautifulSoup(html, 'html.parser')
         ogs = doc.html.head.findAll(property=re.compile(r'^og'))
 
         for og in ogs:
