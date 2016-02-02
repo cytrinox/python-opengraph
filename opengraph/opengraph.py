@@ -8,35 +8,34 @@ from bs4 import BeautifulSoup
 
 
 class OpenGraph(object):
-    useragent = None
-    __data__ = {}
 
     def __init__(self, url=None, html=None, useragent=None):
-        if useragent:
-            self.useragent = useragent
+        self._data = {}
+        self._useragent = useragent
         content = html or self._fetch(url)
         self._parse(content)
 
     def __contains__(self, item):
-        return item in self.__data__
+        return item in self._data
 
     def __getattr__(self, name):
-        if name in self.__data__:
-            return self.__data__[name]
-        raise AttributeError(
-            'Open Graph object has no attribute "{}"'.format(name))
+        if not self.__contains__(name):
+            raise AttributeError(
+                'Open Graph object has no attribute "{}"'.format(name))
+        else:
+            return self._data[name]
 
     def __repr__(self):
-        return self.__data__.__str__()
+        return self._data.__str__()
 
     def __str__(self):
         return self.__repr__()
 
     def _fetch(self, url):
         headers = {}
-        if self.useragent:
+        if self._useragent:
             headers = {
-                'user-agent': self.useragent
+                'user-agent': self._useragent
             }
         response = requests.get(url, headers=headers)
         return response.text
@@ -47,4 +46,5 @@ class OpenGraph(object):
 
         for og in ogs:
             if og.has_attr('content'):
-                self.__data__[og['property'][3:]] = og['content']
+                self._data[og['property'][3:]] = og['content']
+
